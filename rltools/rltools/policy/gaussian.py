@@ -108,7 +108,7 @@ class GaussianGRUPolicy(StochasticPolicy, EzPickle):
     def _make_actiondist_ops(self, obs_B_H_Df):
         B = tf.shape(obs_B_H_Df)[0]
         H = tf.shape(obs_B_H_Df)[1]
-        flatobs_B_H_Df = tf.reshape(obs_B_H_Df, tf.pack([B, H, -1]))
+        flatobs_B_H_Df = tf.reshape(obs_B_H_Df, tf.stack([B, H, -1]))
         if self.state_include_action:
             net_in = tf.concat(2, [flatobs_B_H_Df, self._prev_actions_B_H_Da])
             net_shape = (np.prod(self.observation_space.shape) + self.action_space.shape[0],)

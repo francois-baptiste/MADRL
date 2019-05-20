@@ -351,7 +351,7 @@ class ParamLayer(Layer):
     def get_output_for(self, input, **kwargs):
         ndim = input.get_shape().ndims
         reshaped_param = tf.reshape(self.param, (1,) * (ndim - 1) + (self.num_units,))
-        tile_arg = tf.concat(0, [tf.shape(input)[:ndim - 1], [1]])
+        tile_arg = tf.concat([tf.shape(input)[:ndim - 1], [1]],0)
         tiled = tf.tile(reshaped_param, tile_arg)
         return tiled
 
@@ -397,7 +397,7 @@ class DenseLayer(Layer):
         if input.get_shape().ndims > 2:
             # if the input has more than two dimensions, flatten it into a
             # batch of feature vectors.
-            input = tf.reshape(input, tf.pack([tf.shape(input)[0], -1]))
+            input = tf.reshape(input, tf.stack([tf.shape(input)[0], -1]))
         activation = tf.matmul(input, self.W)
         if self.b is not None:
             activation = activation + tf.expand_dims(self.b, 0)
@@ -725,7 +725,7 @@ class FlattenLayer(Layer):
         # total_entries = tf.reduce_prod(tf.shape(input))
         pre_shape = tf.shape(input)[:self.outdim - 1]
         to_flatten = tf.reduce_prod(tf.shape(input)[self.outdim - 1:])
-        return tf.reshape(input, tf.concat(0, [pre_shape, tf.pack([to_flatten])]))
+        return tf.reshape(input, tf.concat(0, [pre_shape, tf.stack([to_flatten])]))
 
 
 flatten = FlattenLayer  # shortcut
@@ -818,7 +818,7 @@ class ReshapeLayer(Layer):
             if isinstance(o, list):
                 output_shape[dim] = tf.shape(input)[o[0]]
         # Everything else is handled by Theano
-        return tf.reshape(input, tf.pack(output_shape))
+        return tf.reshape(input, tf.stack(output_shape))
 
 
 reshape = ReshapeLayer  # shortcut
@@ -1036,7 +1036,7 @@ class GRULayer(Layer):
         input_shape = tf.shape(input)
         n_batches = input_shape[0]
         n_steps = input_shape[1]
-        input = tf.reshape(input, tf.pack([n_batches, n_steps, -1]))
+        input = tf.reshape(input, tf.stack([n_batches, n_steps, -1]))
         if 'recurrent_state' in kwargs and self in kwargs['recurrent_state']:
             h0s = kwargs['recurrent_state'][self]
         else:
@@ -1072,7 +1072,7 @@ class GRUStepLayer(MergeLayer):
     def get_output_for(self, inputs, **kwargs):
         x, hprev = inputs
         n_batch = tf.shape(x)[0]
-        x = tf.reshape(x, tf.pack([n_batch, -1]))
+        x = tf.reshape(x, tf.stack([n_batch, -1]))
         x.set_shape((None, self.input_shapes[0][1]))
         return self._gru_layer.step(hprev, x)
 
@@ -1130,7 +1130,7 @@ class TfGRULayer(Layer):
             return outputs
         else:
             n_steps = input_shape[1]
-            input = tf.reshape(input, tf.pack([n_batches, n_steps, -1]))
+            input = tf.reshape(input, tf.stack([n_batches, n_steps, -1]))
             # flatten extra dimensions
             shuffled_input = tf.transpose(input, (1, 0, 2))
             shuffled_input.set_shape((None, None, self.input_shape[-1]))
@@ -1319,7 +1319,7 @@ class PseudoLSTMLayer(Layer):
         input_shape = tf.shape(input)
         n_batches = input_shape[0]
         n_steps = input_shape[1]
-        input = tf.reshape(input, tf.pack([n_batches, n_steps, -1]))
+        input = tf.reshape(input, tf.stack([n_batches, n_steps, -1]))
         c0s = tf.tile(
             tf.reshape(self.c0, (1, self.num_units)),
             (n_batches, 1)
@@ -1465,7 +1465,7 @@ class LSTMLayer(Layer):
         input_shape = tf.shape(input)
         n_batches = input_shape[0]
         n_steps = input_shape[1]
-        input = tf.reshape(input, tf.pack([n_batches, n_steps, -1]))
+        input = tf.reshape(input, tf.stack([n_batches, n_steps, -1]))
         h0s = tf.tile(
             tf.reshape(self.h0, (1, self.num_units)),
             (n_batches, 1)
@@ -1504,7 +1504,7 @@ class LSTMStepLayer(MergeLayer):
     def get_output_for(self, inputs, **kwargs):
         x, hcprev = inputs
         n_batch = tf.shape(x)[0]
-        x = tf.reshape(x, tf.pack([n_batch, -1]))
+        x = tf.reshape(x, tf.stack([n_batch, -1]))
         hc = self._recurrent_layer.step(hcprev, x)
         return hc
 
@@ -1582,7 +1582,7 @@ class TfBasicLSTMLayer(Layer):
             return outputs
         else:
             n_steps = input_shape[1]
-            input = tf.reshape(input, tf.pack([n_batches, n_steps, -1]))
+            input = tf.reshape(input, tf.stack([n_batches, n_steps, -1]))
             # flatten extra dimensions
             shuffled_input = tf.transpose(input, (1, 0, 2))
             shuffled_input.set_shape((None, None, self.input_shape[-1]))

@@ -101,8 +101,8 @@ class RecurrentCategorical(Distribution):
     def log_density_expr(self, dist_params_B_H_A, x_B_H_A):
         adim = tf.shape(dist_params_B_H_A)[len(dist_params_B_H_A.get_shape()) - 1]
         flat_logd = self._cat.log_density_expr(
-            tf.reshape(dist_params_B_H_A, tf.pack([-1, adim])),
-            tf.reshape(x_B_H_A, tf.pack([-1, adim])))
+            tf.reshape(dist_params_B_H_A, tf.stack([-1, adim])),
+            tf.reshape(x_B_H_A, tf.stack([-1, adim])))
         return tf.reshape(flat_logd, tf.shape(dist_params_B_H_A)[:2])
 
 

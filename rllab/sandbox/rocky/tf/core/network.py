@@ -211,7 +211,7 @@ class GRUNetwork(object):
             l_output = L.OpLayer(
                 l_output_flat,
                 op=lambda flat_output, l_input:
-                tf.reshape(flat_output, tf.pack((tf.shape(l_input)[0], tf.shape(l_input)[1], -1))),
+                tf.reshape(flat_output, tf.stack((tf.shape(l_input)[0], tf.shape(l_input)[1], -1))),
                 shape_op=lambda flat_output_shape, l_input_shape:
                 (l_input_shape[0], l_input_shape[1], flat_output_shape[-1]),
                 extras=[l_in],
@@ -323,7 +323,7 @@ class LSTMNetwork(object):
             l_output = L.OpLayer(
                 l_output_flat,
                 op=lambda flat_output, l_input:
-                tf.reshape(flat_output, tf.pack((tf.shape(l_input)[0], tf.shape(l_input)[1], -1))),
+                tf.reshape(flat_output, tf.stack((tf.shape(l_input)[0], tf.shape(l_input)[1], -1))),
                 shape_op=lambda flat_output_shape, l_input_shape:
                 (l_input_shape[0], l_input_shape[1], flat_output_shape[-1]),
                 extras=[l_in],

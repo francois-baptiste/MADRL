@@ -1,6 +1,11 @@
+import os, sys
+parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir,'rltools'))
+sys.path.append(parentddir)
+parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir,'rllab'))
+sys.path.append(parentddir)
 from rltools.util import EzPickle, stack_dict_list
 from gym import spaces, error
-from gym.monitoring.video_recorder import ImageEncoder
+from gym.wrappers.monitoring.video_recorder import ImageEncoder
 import numpy as np
 import time
 import scipy
